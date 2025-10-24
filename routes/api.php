@@ -15,8 +15,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes (token required)
 Route::middleware('auth:api')->group(function () {
-    Route::get('/dashboard', [AuthController::class, 'dashboard']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/dashboard/saved/all', [PostsController::class, 'index']);
+    Route::get('/dashboard', [PostsController::class, 'index']);
+    Route::post('/posts/store', [PostsController::class, 'store']);
+    Route::delete('/posts/{postId}', [PostsController::class, 'destroy']);
 });

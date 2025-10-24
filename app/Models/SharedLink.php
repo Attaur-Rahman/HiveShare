@@ -6,36 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Post extends Model
+class SharedLink extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'post_id';
-    public $incrementing = false;
+    // Use UUID instead of auto-increment ID
     protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        'post_id',
+        'shared_id',
         'user_id',
-        'platform',
-        'post_url',
-        'is_favourite',
-        'is_shared',
+        'post_ids',
+        'expires_at',
+    ];
+
+    protected $casts = [
+        'post_ids' => 'array',
+        'expires_at' => 'datetime',
     ];
 
     protected static function boot()
     {
         parent::boot();
 
-        // Auto-generate UUID post_id
-        static::creating(function ($post) {
-            if (empty($post->post_id)) {
-                $post->post_id = (string) Str::uuid();
+        static::creating(function ($link) {
+            if (empty($link->id)) {
+                $link->id = (string) Str::uuid();
             }
         });
     }
 
-    // Relation to user
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');

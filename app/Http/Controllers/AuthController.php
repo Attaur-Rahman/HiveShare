@@ -81,19 +81,19 @@ class AuthController extends Controller
     }
 
     // Dashboard (Protected)
-    public function dashboard()
-    {
-        $user = Auth::user();
+    // public function dashboard()
+    // {
+    //     $user = Auth::user();
 
-        return response()->json([
-            'message' => 'Dashboard data fetched successfully',
-            'user'    => [
-                'user_id' => $user->user_id,
-                'name'  => $user->name,
-                'email' => $user->email,
-            ],
-        ], 200);
-    }
+    //     return response()->json([
+    //         'message' => 'Dashboard data fetched successfully',
+    //         'user'    => [
+    //             'user_id' => $user->user_id,
+    //             'name'  => $user->name,
+    //             'email' => $user->email,
+    //         ],
+    //     ], 200);
+    // }
 
     // Logout (Invalidate token)
     public function logout()

@@ -20,24 +20,36 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
+        // Schema::create('password_reset_tokens', function (Blueprint $table) {
+        //     $table->string('email')->primary();
+        //     $table->string('token');
+        //     $table->timestamp('created_at')->nullable();
+        // });
 
         Schema::create('posts', function (Blueprint $table) {
-            $table->string('post_id')->primary();
+            $table->uuid('post_id')->primary();
             $table->string('user_id');
             $table->foreign('user_id')
                 ->references('user_id')->on('users')
                 ->onDelete('cascade')->onUpdate('cascade');
             $table->enum('platform', ['Instagram', 'Twitter', 'Youtube', 'Facebook', 'LinkedIn']);
             $table->string('post_url', 2083);
-            $table->boolean('shared')->default(false);
-            $table->uuid('uuid')->unique();
+            $table->boolean('is_favourite')->default(false);
+            $table->boolean('is_shared')->default(false);
             $table->timestamps();
         });
+
+        Schema::create('shared_links', function (Blueprint $table) {
+            $table->uuid('shared_id')->primary(); // use UUID as the primary key
+            $table->string('user_id');
+            $table->foreign('user_id')
+                ->references('user_id')->on('users')
+                ->onDelete('cascade')->onUpdate('cascade');
+            $table->json('post_ids');
+            $table->timestamp('expires_at')->nullable();
+            $table->timestamps();
+        });
+
 
         // Schema::create('sessions', function (Blueprint $table) {
         //     $table->string('id')->primary();
@@ -55,8 +67,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
+        // Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('posts');
+        Schema::dropIfExists('shared_links');
         // Schema::dropIfExists('sessions');
     }
 };
