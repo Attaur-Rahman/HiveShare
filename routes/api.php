@@ -17,7 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/dashboard', [PostsController::class, 'index']);
+    Route::get('/posts', [PostsController::class, 'index']);
     Route::post('/posts/store', [PostsController::class, 'store']);
-    Route::delete('/posts/{postId}', [PostsController::class, 'destroy']);
+    Route::delete('/posts/delete/{postId}', [PostsController::class, 'destroy']);
 });
