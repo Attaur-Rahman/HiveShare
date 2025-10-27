@@ -2,67 +2,68 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
-use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Foundation\Auth\User as Authenticatable; // Base user class
+use Laravel\Sanctum\HasApiTokens; // For API tokens
+use Tymon\JWTAuth\Contracts\JWTSubject; // For JWT authentication
 
 class User extends Authenticatable implements JWTSubject
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens;
+    use HasApiTokens; // Enable API token usage
 
-    // Primary key setup
-    protected $primaryKey = 'user_id';
-    public $incrementing = false; // disable auto-increment
-    protected $keyType = 'string'; // custom id is string
+    // Primary key name
+    protected $primaryKey = 'user_id'; // Use 'user_id' as primary key
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    // Disable auto-increment
+    public $incrementing = false; // IDs are not auto-incremented
+
+    // Primary key type
+    protected $keyType = 'string'; // Primary key is a string
+
+    // Disable Laravel timestamps (no updated_at)
+    public $timestamps = false; // We handle created_at manually
+
+    // Fillable fields for mass assignment
     protected $fillable = [
-        'user_id',
-        'name',
-        'email',
-        'password',
+        'user_id', // User ID
+        'name', // User name
+        'email', // User email
+        'password', // User password
+        'created_at', // Created timestamp
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
+    // Automatically cast these fields to datetime
+    protected $casts = [
+        'created_at' => 'datetime', // Convert created_at to datetime
+    ];
+
+    // Hidden fields in API responses
     protected $hidden = [
-        'password',
+        'password', // Hide password
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    // Define attribute casting
     protected function casts(): array
     {
         return [
-            'password' => 'hashed',
+            'password' => 'hashed', // Automatically hash password
         ];
     }
 
+    // Return JWT identifier
     public function getJWTIdentifier()
     {
-        // IMPORTANT: Return user_id (not id)
-        return $this->user_id;
+        return $this->user_id; // Use user_id for JWT
     }
 
+    // Add custom JWT claims
     public function getJWTCustomClaims()
     {
-        return [];
+        return []; // No extra claims
     }
 
+    // Relation: User has many posts
     public function posts()
     {
-        return $this->hasMany(Post::class, 'user_id', 'user_id');
+        return $this->hasMany(Post::class, 'user_id', 'user_id'); // Link to posts table
     }
 }

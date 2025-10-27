@@ -9,21 +9,18 @@ use Illuminate\Support\Facades\Validator;
 
 class PostsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // Get all posts for the logged-in user
     public function index()
     {
-        // Fetch all posts with user info
-        $posts = Post::where('user_id', Auth::user()->user_id) // filter by logged-in user
-            ->select('post_id', 'platform', 'post_url') // only needed columns
-            ->orderBy('created_at', 'desc') // latest posts first
+        $posts = Post::where('user_id', Auth::user()->user_id) // Filter by logged-in user
+            ->select('post_id', 'platform', 'url', 'title', 'description', 'is_favourite') // Select required columns
+            ->orderBy('created_at', 'desc') // Latest posts first
             ->get();
 
-        if ($posts->isEmpty()) {
+        if ($posts->isEmpty()) { // If no posts found
             return response()->json([
                 'message' => 'No posts found'
-            ], 404); // use 404 for not found
+            ], 404);
         }
 
         return response()->json([
@@ -32,19 +29,18 @@ class PostsController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Store a new post for the logged-in user
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'platform' => 'required|in:Instagram,Twitter,Youtube,Facebook,LinkedIn',
-            'post_url' => 'required|url|max:2083',
-            'is_favourite' => 'sometimes|boolean',
-            'is_shared' => 'sometimes|boolean',
+            'platform' => 'required|in:Instagram,Twitter,Youtube,LinkedIn', // Valid platforms
+            'url' => 'required|url|max:2083', // Valid URL
+            'title' => 'required|string|max:255', // Required title
+            'description' => 'nullable|string', // Optional description
+            'is_favourite' => 'sometimes|boolean', // Optional boolean
         ]);
 
-        if ($validator->fails()) {
+        if ($validator->fails()) { // Validation failed
             return response()->json([
                 'message' => 'Validation failed',
                 'errors' => $validator->errors()
@@ -52,11 +48,12 @@ class PostsController extends Controller
         }
 
         $post = Post::create([
-            'platform' => $request->platform,
-            'post_url' => $request->post_url,
-            'user_id' => $request->user()->user_id, // from JWT user
-            'is_favourite' => false,
-            'is_shared' => false,
+            'platform' => $request->platform, // Platform name
+            'url' => $request->url, // Post URL
+            'title' => $request->title, // Title
+            'description' => $request->description, // Description
+            'user_id' => $request->user()->user_id, // Logged-in user ID
+            'is_favourite' => $request->is_favourite ?? false, // Default false
         ]);
 
         return response()->json([
@@ -65,35 +62,49 @@ class PostsController extends Controller
         ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Delete a post by post_id for the logged-in user
     public function destroy($post_id)
     {
-        // Find the post for the logged-in user
+        $post = Post::where('post_id', $post_id) // Find post by ID
+            ->where('user_id', Auth::user()->user_id) // Match with logged-in user
+            ->first();
+
+        if (!$post) { // Post not found or unauthorized
+            return response()->json([
+                'message' => 'Post not found or you are not authorized to delete it.'
+            ], 404);
+        }
+
+        $post->delete(); // Delete post
+
+        return response()->json([
+            'message' => 'Post deleted successfully'
+        ]);
+    }
+
+    // Toggle route for favourite posts
+    public function toggleFavourite($post_id)
+    {
+        // Find the post owned by the logged-in user
         $post = Post::where('post_id', $post_id)
             ->where('user_id', Auth::user()->user_id)
             ->first();
 
         if (!$post) {
             return response()->json([
-                'message' => 'Post not found or you are not authorized to delete it.'
+                'message' => 'Post not found or unauthorized'
             ], 404);
         }
 
-        // Delete the post
-        $post->delete();
+        // Toggle the is_favourite value
+        $post->is_favourite = !$post->is_favourite;
+        $post->save();
 
         return response()->json([
-            'message' => 'Post deleted successfully'
-        ]);
+            'message' => $post->is_favourite
+                ? 'Added to favourites'
+                : 'Removed from favourites',
+            'is_favourite' => $post->is_favourite
+        ], 200);
     }
 }

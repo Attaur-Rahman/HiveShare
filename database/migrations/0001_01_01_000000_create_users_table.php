@@ -1,75 +1,57 @@
 <?php
 
+// Import migration and schema classes
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+// Return an anonymous migration class
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    // Run the migrations
     public function up(): void
     {
+        // Create users table
         Schema::create('users', function (Blueprint $table) {
-            $table->string('user_id')->primary();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->string('user_id')->primary(); // Primary key for user
+            $table->string('name'); // User name
+            $table->string('email')->unique(); // Unique email
+            $table->string('password'); // User password
+            $table->timestamp('created_at')->useCurrent(); // Creation time
         });
 
-        // Schema::create('password_reset_tokens', function (Blueprint $table) {
-        //     $table->string('email')->primary();
-        //     $table->string('token');
-        //     $table->timestamp('created_at')->nullable();
-        // });
-
+        // Create posts table
         Schema::create('posts', function (Blueprint $table) {
-            $table->uuid('post_id')->primary();
-            $table->string('user_id');
-            $table->foreign('user_id')
-                ->references('user_id')->on('users')
-                ->onDelete('cascade')->onUpdate('cascade');
-            $table->enum('platform', ['Instagram', 'Twitter', 'Youtube', 'Facebook', 'LinkedIn']);
-            $table->string('post_url', 2083);
-            $table->boolean('is_favourite')->default(false);
-            $table->boolean('is_shared')->default(false);
-            $table->timestamps();
+            $table->uuid('post_id')->primary(); // Primary key for post
+            $table->string('user_id'); // ID of user who made the post
+            $table->foreign('user_id') // Foreign key setup
+                ->references('user_id')->on('users') // Link to users table
+                ->onDelete('cascade')->onUpdate('cascade'); // Cascade on delete or update
+            $table->enum('platform', ['Instagram', 'Twitter', 'Youtube', 'LinkedIn']); // Post platform
+            $table->string('title'); // Post title
+            $table->text('description')->nullable(); // Post description (optional)
+            $table->string('url', 2083); // link
+            $table->boolean('is_favourite')->default(false); // Mark as favourite
+            $table->timestamp('created_at')->useCurrent(); // Creation time
         });
 
+        // Create shared_links table
         Schema::create('shared_links', function (Blueprint $table) {
-            $table->uuid('shared_id')->primary(); // use UUID as the primary key
-            $table->string('user_id');
-            $table->foreign('user_id')
-                ->references('user_id')->on('users')
-                ->onDelete('cascade')->onUpdate('cascade');
-            $table->json('post_ids');
-            $table->timestamp('expires_at')->nullable();
-            $table->timestamps();
+            $table->uuid('shared_id')->primary(); // Primary key for shared link
+            $table->string('user_id'); // ID of user who shared
+            $table->foreign('user_id') // Foreign key setup
+                ->references('user_id')->on('users') // Link to users table
+                ->onDelete('cascade')->onUpdate('cascade'); // Cascade on delete or update
+            $table->timestamp('expires_at')->nullable(); // Link expiry time
+            $table->timestamp('created_at')->useCurrent(); // Creation time
         });
-
-
-        // Schema::create('sessions', function (Blueprint $table) {
-        //     $table->string('id')->primary();
-        //     $table->foreignId('user_id')->nullable()->index();
-        //     $table->string('ip_address', 45)->nullable();
-        //     $table->text('user_agent')->nullable();
-        //     $table->longText('payload');
-        //     $table->integer('last_activity')->index();
-        // });
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    // Reverse the migrations
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        // Schema::dropIfExists('password_reset_tokens');
-        Schema::dropIfExists('posts');
-        Schema::dropIfExists('shared_links');
-        // Schema::dropIfExists('sessions');
+        Schema::dropIfExists('users'); // Delete users table
+        Schema::dropIfExists('posts'); // Delete posts table
+        Schema::dropIfExists('shared_links'); // Delete shared_links table
     }
 };

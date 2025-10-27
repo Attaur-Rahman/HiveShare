@@ -2,22 +2,22 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostsController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\SharedLinkController;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
 // Public routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']); // Register new user
+Route::post('/login', [AuthController::class, 'login']); // Login and get JWT token
+Route::get('/shared-link/{shared_id}', [SharedLinkController::class, 'show']); // Public shared link access
 
-// Protected routes (token required)
+// Protected routes (JWT token required)
 Route::middleware('auth:api')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/logout', [AuthController::class, 'logout']); // Logout user
 
-    Route::get('/posts', [PostsController::class, 'index']);
-    Route::post('/posts/store', [PostsController::class, 'store']);
-    Route::delete('/posts/delete/{postId}', [PostsController::class, 'destroy']);
+    // Post routes
+    Route::get('/posts', [PostsController::class, 'index']); // Get all posts
+    Route::post('/posts', [PostsController::class, 'store']); // Create a new post
+    Route::delete('/posts/{post_id}', [PostsController::class, 'destroy']); // Delete a post by ID
+    Route::patch('/posts/{post_id}/favourite', [PostsController::class, 'toggleFavourite']); // Toggle favourite
+    Route::post('/share-link', [SharedLinkController::class, 'store']); // Create new shared link
 });
