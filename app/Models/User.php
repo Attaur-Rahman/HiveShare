@@ -3,13 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable; // Base user class
-use Laravel\Sanctum\HasApiTokens; // For API tokens
 use Tymon\JWTAuth\Contracts\JWTSubject; // For JWT authentication
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens; // Enable API token usage
-
     // Primary key name
     protected $primaryKey = 'user_id'; // Use 'user_id' as primary key
 
