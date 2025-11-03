@@ -11,10 +11,10 @@ use Illuminate\Support\Str;
 class SharedLinkController extends Controller
 {
     // Store a new shared link for the logged-in user
-    public function store(Request $request)
+    public function store()
     {
         // Optional expiry time (default: 24 hours)
-        $expiresAt = now()->addMinutes(2);
+        $expiresAt = now()->addMinutes(24);
 
         // Check if the user already has a shared link
         $existingLink = SharedLink::where('user_id', Auth::user()->user_id)->first();
@@ -33,7 +33,7 @@ class SharedLinkController extends Controller
         return response()->json([
             'message' => 'Shared link generated successfully',
             'expires_at' => $sharedLink->expires_at,
-            'public_url' => url("/api/shared-link/{$sharedLink->shared_id}"),
+            'public_url' => $sharedLink->shared_id
         ], 201);
     }
 
@@ -49,13 +49,14 @@ class SharedLinkController extends Controller
             return response()->json(['message' => 'Shared link has expired'], 410);
 
         // Fetch post with only required fields
-        $post = Post::where('user_id', $link->user_id)
-            ->select('post_id', 'platform', 'url', 'title', 'description')
-            ->first();
+        $posts = Post::where('user_id', $link->user_id)
+            ->select('post_id', 'platform', 'url', 'title', 'description') // Select required columns
+            ->orderBy('created_at', 'desc') // Latest posts first
+            ->get();
 
         return response()->json([
             'message' => 'Shared link fetched successfully',
-            'post' => $post,
+            'posts' => $posts,
         ], 200);
     }
 }

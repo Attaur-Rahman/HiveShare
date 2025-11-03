@@ -34,7 +34,7 @@ class PostsController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'platform' => 'required|in:Instagram,Twitter,Youtube,LinkedIn', // Valid platforms
-            'url' => 'required|url|max:2083', // Valid URL
+            'url' => 'required|string', // Valid URL
             'title' => 'required|string|max:255', // Required title
             'description' => 'nullable|string', // Optional description
             'is_favourite' => 'sometimes|boolean', // Optional boolean

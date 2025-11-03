@@ -5,6 +5,15 @@ use App\Http\Controllers\PostsController;
 use App\Http\Controllers\SharedLinkController;
 use Illuminate\Support\Facades\Route;
 
+// Default Route 
+Route::get('/', function () {
+    return response()->json([
+        'app' => config('app.name'),
+        'version' => app()->version(),
+        'status' => 'API running successfully 🚀',
+    ]);
+});
+
 // Public routes
 Route::post('/register', [AuthController::class, 'register']); // Register new user
 Route::post('/login', [AuthController::class, 'login']); // Login and get JWT token

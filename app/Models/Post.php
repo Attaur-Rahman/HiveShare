@@ -34,6 +34,7 @@ class Post extends Model
     // Cast fields to specific data types
     protected $casts = [
         'created_at' => 'datetime', // Convert created_at to datetime
+        'is_favourite' => 'boolean',
     ];
 
     // Auto-generate UUID when creating a post
