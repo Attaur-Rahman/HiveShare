@@ -19,7 +19,7 @@ class AuthController extends Controller
         do {
             // Example: 23101925
             $user_id = date('d') . rand(00, 99) . date('m') . rand(00, 99) . date('y');
-        } while (DB::table('users')->where('user_id', $user_id)->exists());
+        } while (User::where('user_id', $user_id)->exists());
 
         return $user_id;
     }
@@ -80,21 +80,6 @@ class AuthController extends Controller
         ], 200);
     }
 
-    // Dashboard (Protected)
-    // public function dashboard()
-    // {
-    //     $user = Auth::user();
-
-    //     return response()->json([
-    //         'message' => 'Dashboard data fetched successfully',
-    //         'user'    => [
-    //             'user_id' => $user->user_id,
-    //             'name'  => $user->name,
-    //             'email' => $user->email,
-    //         ],
-    //     ], 200);
-    // }
-
     // Logout (Invalidate token)
     public function logout()
     {
@@ -110,19 +95,4 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
-    // Refresh Token
-    // public function refresh()
-    // {
-    //     try {
-    //         $newToken = JWTAuth::refresh(JWTAuth::getToken());
-
-    //         return response()->json([
-    //             'message' => 'Token refreshed successfully',
-    //             'token'   => $newToken,
-    //         ], 200);
-    //     } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-    //         return response()->json(['error' => 'Token refresh failed'], 500);
-    //     }
-    // }
 }
