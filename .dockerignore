@@ -1,5 +1,0 @@
-node_modules
-vendor
-npm-debug.log
-storage/logs/*.log
-.git
