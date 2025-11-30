@@ -14,9 +14,9 @@ class Cors
     {
         $origin = $request->headers->get('Origin');
 
-        // Allow only the specified origin
+        // Block non-allowed origins with standard 403 error
         if ($origin !== $this->allowedOrigin) {
-            return response()->json(['message' => 'CORS: Origin not allowed'], 403);
+            abort(403, 'CORS: Origin not allowed');
         }
 
         // Preflight OPTIONS request
