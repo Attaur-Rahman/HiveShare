@@ -50,8 +50,8 @@ class PostsController extends Controller
         $post = Post::create([
             'platform' => $request->platform, // Platform name
             'url' => $request->url, // Post URL
-            'title' => $request->title, // Title
-            'description' => $request->description, // Description
+            'title' => ucwords($request->title), // Title
+            'description' => ucfirst($request->description), // Description
             'user_id' => $request->user()->user_id, // Logged-in user ID
             'is_favourite' => $request->is_favourite ?? false, // Default false
         ]);
