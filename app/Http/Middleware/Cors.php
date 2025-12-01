@@ -24,7 +24,7 @@ class Cors
             return response('', 200)
                 ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept')
+                ->header('Access-Control-Allow-Headers', '*')
                 ->header('Access-Control-Allow-Credentials', 'true');
         }
 
@@ -34,7 +34,7 @@ class Cors
         return $response
             ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
             ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept')
+            ->header('Access-Control-Allow-Headers', '*')
             ->header('Access-Control-Allow-Credentials', 'true');
     }
 }
