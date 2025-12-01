@@ -19,22 +19,23 @@ class Cors
             abort(403, 'CORS: Origin not allowed');
         }
 
+        $requestedHeaders = $request->header('Access-Control-Request-Headers', '');
+
         // Preflight OPTIONS request
         if ($request->getMethod() === 'OPTIONS') {
             return response('', 200)
                 ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', '*')
+                ->header('Access-Control-Allow-Headers', $requestedHeaders)
                 ->header('Access-Control-Allow-Credentials', 'true');
         }
 
-        // Normal request
         $response = $next($request);
 
         return $response
             ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
             ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', '*')
+            ->header('Access-Control-Allow-Headers', $requestedHeaders)
             ->header('Access-Control-Allow-Credentials', 'true');
     }
 }
