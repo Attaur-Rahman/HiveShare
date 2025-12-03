@@ -3,6 +3,7 @@
 // Import migration and schema classes
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 // Return an anonymous migration class
@@ -17,7 +18,7 @@ return new class extends Migration
             $table->string('name'); // User name
             $table->string('email')->unique(); // Unique email
             $table->string('password'); // User password
-            $table->timestamp('created_at')->useCurrent(); // Creation time
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP')); // Creation time
         });
 
         // Create posts table
@@ -27,12 +28,13 @@ return new class extends Migration
             $table->foreign('user_id') // Foreign key setup
                 ->references('user_id')->on('users') // Link to users table
                 ->onDelete('cascade')->onUpdate('cascade'); // Cascade on delete or update
-            $table->enum('platform', ['Instagram', 'Twitter', 'Youtube', 'LinkedIn']); // Post platform
+            $table->string('platform'); // Post platform
             $table->string('title'); // Post title
             $table->text('description')->nullable(); // Post description (optional)
             $table->string('url', 2083); // link
             $table->boolean('is_favourite')->default(false); // Mark as favourite
-            $table->timestamp('created_at')->useCurrent(); // Creation time
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP')); // Creation time
+
         });
 
         // Create shared_links table
@@ -43,7 +45,7 @@ return new class extends Migration
                 ->references('user_id')->on('users') // Link to users table
                 ->onDelete('cascade')->onUpdate('cascade'); // Cascade on delete or update
             $table->timestamp('expires_at')->nullable(); // Link expiry time
-            $table->timestamp('created_at')->useCurrent(); // Creation time
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP')); // Creation time
         });
     }
 
