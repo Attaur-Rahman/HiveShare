@@ -4,38 +4,35 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class Cors
 {
-    protected $allowedOrigin = 'https://hiveshare.vercel.app';
-
     public function handle(Request $request, Closure $next)
     {
+        $allowedOrigins = explode(',', env('ALLOWED_ORIGINS', ''));
         $origin = $request->headers->get('Origin');
 
-        // Block non-allowed origins with standard 403 error
-        if ($origin !== $this->allowedOrigin) {
-            abort(403, 'CORS: Origin not allowed');
-        }
+        // Allow requests without Origin (Postman, server-to-server)
+        $originAllowed = $origin && in_array($origin, $allowedOrigins);
 
-        $requestedHeaders = $request->header('Access-Control-Request-Headers', '');
-
-        // Preflight OPTIONS request
+        // Preflight request
         if ($request->getMethod() === 'OPTIONS') {
             return response('', 200)
-                ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
+                ->header('Access-Control-Allow-Origin', $originAllowed ? $origin : '')
                 ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-                ->header('Access-Control-Allow-Headers', $requestedHeaders)
+                ->header('Access-Control-Allow-Headers', $request->header('Access-Control-Request-Headers', '*'))
                 ->header('Access-Control-Allow-Credentials', 'true');
         }
 
         $response = $next($request);
 
-        return $response
-            ->header('Access-Control-Allow-Origin', $this->allowedOrigin)
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', $requestedHeaders)
-            ->header('Access-Control-Allow-Credentials', 'true');
+        if ($originAllowed) {
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+            $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
+            $response->headers->set('Access-Control-Allow-Headers', $request->header('Access-Control-Request-Headers', '*'));
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+        }
+
+        return $response;
     }
 }
